@@ -2,7 +2,7 @@
 
 ## Project Description
 
-**ECG12Net** is a deep learning project designed to process ECG (Electrocardiogram) signals for predicting potassium ($K^{+}$) concentrations. The project employs complex neural network architectures built using **PyTorch** to solve classification and regression problems based on ECG data. This project is currently **under development**.
+**ECG-Potassium-Estimation** is a deep learning project designed to process ECG (Electrocardiogram) signals for predicting potassium (K⁺) concentrations. The project employs complex neural network architectures built using **PyTorch** to solve classification and regression problems based on ECG data. This project is currently **under development**.
 
 ---
 
@@ -46,7 +46,7 @@ This will initialize the model and display example output to verify the implemen
 
 #### Features
 - Implements modular neural network blocks such as `DenseBlock`, `TransitionLayer`, and `PoolingBlock`.
-- Defines core models, including `ECG12Net` and `EMPNet`, to handle ECG signal processing and K concentration prediction.
+- Defines core models, including `ECG12Net` and `EMPNet`, to handle ECG signal processing and K⁺ concentration prediction.
 - Provides data preprocessing utilities like `encode_k_class` and `encode_k_concentration`.
 
 #### Model Overview
@@ -82,6 +82,12 @@ This will initialize the model and display example output to verify the implemen
 - Complete the `train.py` pipeline by integrating training and validation.
 - Add data augmentation techniques to improve generalization.
 - Conduct hyperparameter tuning and performance evaluations.
+
+---
+
+## Acknowledgments
+
+This project draws inspiration from the methodologies and concepts outlined in the **ECG12Net** research paper. The original work is credited to the authors of that paper. This project is not affiliated with or directly derived from the original study but builds upon its concepts for educational and research purposes.
 
 ---
 
