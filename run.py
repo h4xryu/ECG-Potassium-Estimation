@@ -1,25 +1,44 @@
 
-from models import *
-from train import *
+import argparse
+import os
+
+
+def get_experiment_functions():
+    return {
+        i: globals()[f"exp{i}"]
+        for i in range(1, 101)  # 최대 100개의 실험 함수 등록 가능
+        if f"exp{i}" in globals()
+    }
+
+from experiments import *
+def main():
+    # Argument parser 설정
+    root = './dataset'
+    parser = argparse.ArgumentParser(description="Experiment Runner with Training Epochs")
+    parser.add_argument("--exp", type=int, required=True, help="Experiment number to run (e.g., 1, 2, 3)")
+    parser.add_argument("--train_epoch", type=int, default=10, help="Number of training epochs (default: 10)")
+
+    # 인자 파싱
+    args = parser.parse_args()
+
+    # Experiment 실행
+    exp_functions = get_experiment_functions()
+
+    if args.exp in exp_functions:
+        print(f"Running experiment {args.exp} with {args.train_epoch} training epochs...")
+        exp_functions[args.exp](root,args.train_epoch)  # 해당 실험 함수 실행
+    else:
+        print(f"Experiment {args.exp} is not defined. Please choose from {list(exp_functions.keys())}.")
 
 if __name__ == '__main__':
-    # 데이터셋 생성
-    # dataset = ECGDataset(ecg_data, k_values)
-    #
-    # # DataLoader로 배치 처리
-    # dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
+    root = './dataset'
 
-    # # 샘플 데이터 생성
-    # k_values = np.random.uniform(1.5, 7.5, size=100)  # K+ 농도 샘플 생성
-    # encoded_labels = [encode_k_concentration(encode_k_class(k)) for k in k_values]  # 클래스 라벨로 변환
-    #
-    # # PyTorch Tensor로 변환
-    # labels = torch.tensor(encoded_labels, dtype=torch.long)  # 분류 문제이므로 long 타입 사용
-    # print(labels)
-    model = ECG12Net2()
-    example_input = torch.randn(1, 12, 1024)
-    emp_input = torch.randn(1, 8)
-
-    output = model(example_input,emp_input)
-    print(output)
-
+    # plt.plot(array1[7])
+    # print(array2[7])
+    # print(array3[7])
+    # plt.show()q
+    # generate_datas(root='./dataset')
+    # main()
+    # exp2(root,epoch=3000)
+    exp4(root, epoch=500)
+    # exp5(root, epoch=2000)

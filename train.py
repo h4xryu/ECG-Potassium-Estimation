@@ -1,71 +1,141 @@
+import random
+
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, WeightedRandomSampler
+from IPython.core.pylabtools import figsize
+from torch.distributed import group
+from torch.utils.data import ConcatDataset
+import seaborn as sns
+from data_load import *
+from utils import visualize
+from utils.dataset.Severance import *
+from model import *
+from sklearn.model_selection import train_test_split, KFold
+from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
+def test_model(ecg,spl, model, criterion):
+    """
+    테스트 데이터셋을 사용하여 모델을 평가하는 함수.
 
-def train_model(model, train_loader, val_loader, epochs, learning_rate, class_weights):
+    Args:
+        model: 훈련된 모델.
+        test_loader: 테스트 데이터 로더.
+        device: 실행 디바이스 (CPU 또는 GPU).
+        criterion: 손실 함수.
+
+    Returns:
+        평균 손실과 실제값 및 예측값 리스트.
+    """
+    min_len = min(len(signal) for signal in ecg)
+
+    x_train, x_test, y_train, y_test = train_test_split(ecg, spl, test_size=0.2, random_state=42)
+    x_train = [series[0:min_len] for series in x_train]
+    x_test = [series[0:min_len] for series in x_test]
+    train_dataset = ECGDataset(x_train, y_train)
+    test_dataset = ECGDataset(x_test, y_test)
+
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = model.to(device)
+    model.eval()  # 모델을 평가 모드로 전환
+    test_loss = 0.0
+    predictions = []
+    ground_truths = []
+    with torch.no_grad():
+        for sig_batch, lab_batch in test_loader:
+            sig_batch = sig_batch.unsqueeze(1).to(device)
+            lab_batch = lab_batch.unsqueeze(1).to(device)
 
-    # Adam Optimizer와 Learning Rate Scheduler 설정
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-4)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=2, verbose=True)
+            outputs = model(sig_batch)
+            loss = criterion(outputs, lab_batch)
+            test_loss += loss.item()
 
-    # 가중 손실 함수 정의
-    criterion = nn.CrossEntropyLoss(weight=torch.tensor(class_weights, dtype=torch.float32).to(device))
+            # 저장
+            predictions.extend(outputs.cpu().numpy())
+            ground_truths.extend(lab_batch.cpu().numpy())
 
-    best_val_loss = float('inf')
+    avg_loss = test_loss / len(test_loader)
+    print(f"Test Loss: {avg_loss:.4f}")
+    return avg_loss, predictions, ground_truths
 
-    for epoch in range(epochs):
-        # Training phase
+
+def train(model, device, ecg, spl, criterion, num_epochs=3000):
+    min_len = min(len(signal) for signal in ecg)
+    print(min_len)
+    print()
+    print()
+    k_folds = 5
+
+    torch.manual_seed(42)
+    kfold = KFold(n_splits=k_folds, shuffle=True)
+    x_train, x_test, y_train, y_test = train_test_split(ecg, spl, test_size=0.2, random_state=42)
+    x_train = [series[0:min_len] for series in x_train]
+    x_test = [series[0:min_len] for series in x_test]
+    train_dataset = ECGDataset(x_train, y_train)
+    test_dataset = ECGDataset(x_test, y_test)
+    dataset = ConcatDataset([train_dataset, test_dataset])
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
+    writer = SummaryWriter(log_dir='./logs')
+
+    input_size = min_len
+    # model = DCRNNModel(input_size).to(device)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.00005)
+    best_loss = float('inf')
+    best_model_state = None
+
+    # 7. 학습 루프
+
+        # Initialize optimize
+
+        # for epoch in (tqdm(range(num_epochs),desc='training',total=num_epochs)):
+    for epoch in range(num_epochs):
         model.train()
         train_loss = 0.0
 
-        for inputs, targets in train_loader:
-            inputs, targets = inputs.to(device), targets.to(device)
+        for sig_batch, lab_batch in tqdm(train_loader,desc='training',total=len(train_loader)):
+            sig_batch = sig_batch.unsqueeze(1).to(device)
+            lab_batch = lab_batch.unsqueeze(1).to(device)
+
+                # for signal, label in zip(sig_batch, lab_batch):
+                #     signal, label = signal.to(device), label.to(device)
             optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
+            outputs = model(sig_batch)
+            loss = criterion(outputs, lab_batch)
             loss.backward()
             optimizer.step()
-            train_loss += loss.item() * inputs.size(0)
+            train_loss += loss.item()
 
-        train_loss /= len(train_loader.dataset)
+        writer.add_scalar("Loss/train", train_loss / len(train_loader), epoch)
+        print(f" Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss / len(train_loader):.4f}", end='')
 
-        # Validation phase
+            # 8. 테스트
         model.eval()
-        val_loss = 0.0
+        test_loss = 0.0
         with torch.no_grad():
-            for inputs, targets in val_loader:
-                inputs, targets = inputs.to(device), targets.to(device)
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                val_loss += loss.item() * inputs.size(0)
-
-        val_loss /= len(val_loader.dataset)
-
-        # Learning rate scheduler update
-        scheduler.step(val_loss)
-
-        # Best model 저장
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            torch.save(model.state_dict(), "best_model.pth")
-            print(f"Best model saved at epoch {epoch + 1} with validation loss: {val_loss:.4f}")
-
-        print(f"Epoch {epoch + 1}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
-
-    print("Training complete. Best validation loss:", best_val_loss)
+            for sig_batch, lab_batch in test_loader:
+                sig_batch = sig_batch.unsqueeze(1).to(device)
+                lab_batch = lab_batch.unsqueeze(1).to(device)
 
 
-# Example training loop setup (requires DataLoader)
-# Initialize DataLoader with WeightedRandomSampler
-def create_dataloaders(dataset, labels, batch_size, class_weights):
-    # Weighted sampler
-    sample_weights = torch.tensor([class_weights[label] for label in labels])
-    sampler = WeightedRandomSampler(sample_weights, len(sample_weights))
+                outputs = model(sig_batch)
+                loss = criterion(outputs, lab_batch)
+                test_loss += loss.item()
+        avg_test_loss = test_loss / len(test_loader)
+        print(f" Validation Loss: {test_loss / len(test_loader):.4f}")
+        writer.add_scalar("Loss/Valid", test_loss / len(test_loader), epoch)
 
-    # Train DataLoader
-    train_loader = DataLoader(dataset, batch_size=batch_size, sampler=sampler)
-    return train_loader
+            # 베스트 모델 갱신
+        if avg_test_loss < best_loss:
+            best_loss = avg_test_loss
+            best_model_state = model.state_dict()
+
+    writer.close()
+    # best_model = DCRNNModel().to(device)
+    # best_model.load_state_dict(best_model_state)
+    # print(f"Best Validation Loss: {best_loss:.4f}")
+    return model
