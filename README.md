@@ -5,7 +5,7 @@ This repository contains implementations and preprocessing methods for deep lear
 
 **Dataset**
 
-| Potassium Concentration Range (mEq/L) | Number of Samples |
+| Potassium Concentration Range (Lead-II) (mEq/L) | Number of Samples |
 |---------------------------------------|-------------------|
 | `< 4.0`                               | 52                |
 | `4.0 - 5.0`                           | 190               |
@@ -20,6 +20,11 @@ This repository contains implementations and preprocessing methods for deep lear
 Preprocessing Overview: Refer to the included visualizations and preprocessing function for insights into the signal preparation process.
 
 ## Preprocessing
+
+**Signal extraction**
+  ![Signal extraction](https://ifh.cc/g/lRoHf9.png)
+
+Used viterbi algorithm
 
 **PQRST Annotation**  
    ![PQRST Annotation](https://ifh.cc/g/mWLP8Q.png)
