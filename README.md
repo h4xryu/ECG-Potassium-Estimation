@@ -1,108 +1,76 @@
-# ECG-Potassium-Estimation
+# Deep Learning based Serum potassium estimation
+***
 
-## Project Description
+This repository contains implementations and preprocessing methods for deep learning-based potassium level prediction from ECG signals. The dataset consists of 1,567 patients' ECG signals (Lead-II) sampled at 500 Hz from Wonju Severance Hospital.
 
-**ECG-Potassium-Estimation** is a deep learning project designed to process ECG (Electrocardiogram) signals for predicting potassium (K⁺) concentrations. The project employs complex neural network architectures built using **PyTorch** to solve classification and regression problems based on ECG data. This project is currently **under development**.
+**Dataset**
 
----
+| Potassium Concentration Range (mEq/L) | Number of Samples |
+|---------------------------------------|-------------------|
+| `< 4.0`                               | 52                |
+| `4.0 - 5.0`                           | 190               |
+| `5.0 - 6.0`                           | 496               |
+| `6.0 - 7.0`                           | 336               |
+| `7.0 - 8.0`                           | 341               |
+| `> 8.0`                               | 152               |
 
-## Project Structure
+**Serum Potassium level Distribution**  
+   ![Potassium Distribution](https://ifh.cc/g/cFKT1Q.png)
 
-```plaintext
-├── models
-│   ├── __init__.py
-│   ├── ECG_12Net.py  # Model definitions and utility functions
-├── train.py      # Model training code
-├── run.py        # Main execution script
-```
+Preprocessing Overview: Refer to the included visualizations and preprocessing function for insights into the signal preparation process.
 
----
+## Preprocessing
 
-## Installation and Execution
+**PQRST Annotation**  
+   ![PQRST Annotation](https://ifh.cc/g/mWLP8Q.png)
 
-### 1. Set Up the Environment
+In case, whenever i run into the problem difficult to find PQRST parameter, I used to crop by R-peak-wise
+   
+**Signal Cycle**  
+   ![Signal Cycle](https://ifh.cc/g/LX4y0y.png) 
 
-Run the following command to install the required Python packages:
 
-```bash
-pip install torch dask networkx numpy
-```
 
-### 2. Execute the Program
+## Preprocessing Pipeline
 
-#### Test Run
+The following preprocessing steps were applied to the ECG signals before feeding them into the model:
+1. **Baseline Wander Removal**: Removes low-frequency noise.
+2. **High-Pass Filtering**: Eliminates DC components and slow drift.
+3. **Bandstop Filtering**: Suppresses powerline interference.
 
-```bash
-python run.py
-```
+## Model
+Depth-wise separable convolution + LSTM
+  ![nn](https://ifh.cc/g/gmlLSQ.png)
+  ![nn](https://ifh.cc/g/gl5D4f.png)
 
-This will initialize the model and display example output to verify the implementation.
+## DCRNNModel Architecture
 
----
+The `DCRNNModel` architecture consists of the following layers:
 
-## Key Files and Functionality
+| Layer                 | Description                                                                                   | Parameters                     |
+|-----------------------|-----------------------------------------------------------------------------------------------|--------------------------------|
+| **DepthwiseConv1D**   | Depthwise convolution with kernel size 368 and padding 32                                     | Input: `in_channel`, Output: `in_channel` |
+| **PointwiseConv1D**   | Pointwise convolution with kernel size 1, output channels: 64                                 | Input: `in_channel`, Output: 64 |
+| **BatchNorm1d**       | Batch normalization after pointwise convolution                                               | Input: 64, Output: 64          |
+| **MaxPool1d**         | Max pooling with kernel size 2                                                               | Input: 64, Output: 64          |
+| **DepthwiseConv1D**   | Depthwise convolution with kernel size 128 and padding 32                                     | Input: 64, Output: 64          |
+| **PointwiseConv1D**   | Pointwise convolution with kernel size 1, output channels: 128                                | Input: 64, Output: 128         |
+| **BatchNorm1d**       | Batch normalization after pointwise convolution                                               | Input: 128, Output: 128        |
+| **MaxPool1d**         | Max pooling with kernel size 2                                                               | Input: 128, Output: 128        |
+| **DepthwiseConv1D**   | Depthwise convolution with kernel size 32 and padding 32                                      | Input: 128, Output: 128        |
+| **PointwiseConv1D**   | Pointwise convolution with kernel size 1, output channels: 256                                | Input: 128, Output: 256        |
+| **BatchNorm1d**       | Batch normalization after pointwise convolution                                               | Input: 256, Output: 256        |
+| **LSTM**              | LSTM with input size 256, hidden size 64, 3 layers                                           | Input: 256, Output: 64         |
+| **Fully Connected**   | Fully connected layer with input size `53 * 64`, output size: 1                              | Input: `53 * 64`, Output: 1    |
+| **Dropout**           | Dropout with probability 0.2                                                                 | Applied to fully connected layer |
 
-### 1. `models/ECG_12Net.py`
+## Perfomance
 
-#### Features
+**Model Loss Curve (Huber Loss)**  
+  ![loss](https://ifh.cc/g/8zbZwt.png)
 
-- Implements modular neural network blocks such as `DenseBlock`, `TransitionLayer`, and `PoolingBlock`.
-- Defines core models, including `ECG12Net` and `EMPNet`, to handle ECG signal processing and K⁺ concentration prediction.
-- Provides data preprocessing utilities like `encode_k_class` and `encode_k_concentration`.
+**Heatmap**
+  ![heatmap](https://ifh.cc/g/movOD8.png)
 
-#### Model Overview
-
-- **ECG12Net**: Processes 12-lead ECG data in parallel, combining individual lead information into a unified representation.
-- **EMPNet**: Processes additional input features for enhanced predictions.
-
----
-
-### 2. `train.py`
-
-#### Features
-
-- **`train_model`**: Handles the training loop, saving the best model based on validation loss.
-- **`create_dataloaders`**: Prepares data loaders using a `WeightedRandomSampler` to address class imbalance.
-
----
-
-### 3. `run.py`
-
-#### Features
-
-- Initializes the model and generates sample data.
-- Displays initial predictions for validation.
-
----
-
-## Current Status and Future Work
-
-### Incomplete Features
-
-- Dataset loading and processing (e.g., `ECGDataset` class is missing).
-- Integration of real-world datasets and validation metrics.
-- Optimization for better model performance.
-
-### Next Steps
-
-- Complete the `train.py` pipeline by integrating training and validation.
-- Add data augmentation techniques to improve generalization.
-- Conduct hyperparameter tuning and performance evaluations.
-
----
-
-## Acknowledgments
-
-This project draws inspiration from the methodologies and concepts outlined in the **ECG12Net** research paper. The original work is credited to the authors of that paper. This project is not affiliated with or directly derived from the original study but builds upon its concepts for educational and research purposes.
-
----
-
-## Contribution
-
-Contributions to this project are welcome. If you have suggestions or improvements, feel free to submit a pull request or raise an issue.
-
----
-
-## License
-
-This project is open-source and licensed under the [MIT License](LICENSE).
+**Boxplots**
+  ![boxplot](https://ifh.cc/g/wVvvQc.png)
