@@ -82,7 +82,7 @@ The `DCRNNModel` architecture consists of the following layers:
 
 **Heatmap**
 
-  ![heatmap](https://ifh.cc/g/movOD8.png)
+  ![heatmap](https://ifh.cc/g/2Mcs0B.png)
 
 **Boxplots**
 
