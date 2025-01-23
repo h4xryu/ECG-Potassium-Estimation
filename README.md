@@ -19,6 +19,8 @@ This repository contains implementations and preprocessing methods for deep lear
 
 Preprocessing Overview: Refer to the included visualizations and preprocessing function for insights into the signal preparation process.
 
+---
+
 ## Preprocessing
 
 **Signal extraction**
@@ -26,14 +28,13 @@ Preprocessing Overview: Refer to the included visualizations and preprocessing f
 
 Used viterbi algorithm
 
-**PQRST Annotation**  
+**PQRST Detection**  
    ![PQRST Annotation](https://ifh.cc/g/mWLP8Q.png)
 
 In case, whenever i run into the problem difficult to find PQRST parameter, I used to crop by R-peak-wise
    
 **Signal Cycle**  
    ![Signal Cycle](https://ifh.cc/g/LX4y0y.png) 
-
 
 
 ## Preprocessing Pipeline
@@ -47,6 +48,8 @@ The following preprocessing steps were applied to the ECG signals before feeding
 Depth-wise separable convolution + LSTM
   ![nn](https://ifh.cc/g/gmlLSQ.png)
   ![nn](https://ifh.cc/g/gl5D4f.png)
+
+---
 
 ## DCRNNModel Architecture
 
@@ -69,13 +72,18 @@ The `DCRNNModel` architecture consists of the following layers:
 | **Fully Connected**   | Fully connected layer with input size `53 * 64`, output size: 1                              | Input: `53 * 64`, Output: 1    |
 | **Dropout**           | Dropout with probability 0.2                                                                 | Applied to fully connected layer |
 
+
+---
 ## Perfomance
 
 **Model Loss Curve (Huber Loss)**  
+
   ![loss](https://ifh.cc/g/8zbZwt.png)
 
 **Heatmap**
+
   ![heatmap](https://ifh.cc/g/movOD8.png)
 
 **Boxplots**
+
   ![boxplot](https://ifh.cc/g/wVvvQc.png)
