@@ -228,18 +228,35 @@ Notes:
      
    - confusion matrix
       ![nn](https://ifh.cc/g/frC8vK.png)
-     Classification Report:
-              precision    recall  f1-score   support
-
-        <4.0       0.00      0.00      0.00         4
-     4.0-5.0       0.25      0.04      0.06        28
-     5.0-6.0       0.51      0.42      0.46        52
-     6.0-7.0       0.29      0.50      0.36        36
-     7.0-8.0       0.27      0.46      0.34        28
-        >8.0       0.43      0.18      0.25        17
-
-    accuracy                           0.35       165
-   macro avg       0.29      0.27      0.25       165
-weighted avg       0.36      0.35      0.32       165
      
+## Model Performance
 
+### Classification Metrics by Potassium Range
+
+| Range (mEq/L) | Precision | Recall | F1-Score | Support |
+|---------------|-----------|---------|----------|----------|
+| < 4.0         | 0.00      | 0.00    | 0.00     | 4        |
+| 4.0-5.0       | 0.25      | 0.04    | 0.06     | 28       |
+| 5.0-6.0       | 0.51      | 0.42    | 0.46     | 52       |
+| 6.0-7.0       | 0.29      | 0.50    | 0.36     | 36       |
+| 7.0-8.0       | 0.27      | 0.46    | 0.34     | 28       |
+| > 8.0         | 0.43      | 0.18    | 0.25     | 17       |
+
+### Overall Performance Metrics
+
+| Metric        | Score |
+|---------------|-------|
+| Accuracy      | 0.35  |
+| Macro Avg     | 0.25  |
+| Weighted Avg  | 0.32  |
+
+### Key Observations:
+1. Best performance in the 5.0-6.0 mEq/L range (F1-score: 0.46)
+2. Limited performance in extreme ranges (< 4.0 and > 8.0 mEq/L)
+3. Model shows moderate recall for 6.0-7.0 and 7.0-8.0 ranges
+4. Overall accuracy of 35% across all ranges
+
+### Dataset Distribution:
+- Total samples: 165
+- Largest class: 5.0-6.0 mEq/L (52 samples)
+- Smallest class: < 4.0 mEq/L (4 samples)
