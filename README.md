@@ -218,6 +218,7 @@ Notes:
 
    - reconstruction test
       ![nn](https://ifh.cc/g/QNbCpg.png)
+      ![nn](https://ifh.cc/g/DbX5JZ.png)
       Reconstruction Error - MSE: 39.744705, MAE: 3.202912
      
    - confusion matrix
