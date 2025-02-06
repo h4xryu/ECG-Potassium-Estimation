@@ -35,12 +35,6 @@ Used viterbi algorithm
 **PQRST Detection**  
    ![PQRST Annotation](https://ifh.cc/g/mWLP8Q.png)
 
-In case, whenever i run into the problem difficult to find PQRST parameter, I used to crop by R-peak-wise
-   
-**Signal Cycle**  
-   ![Signal Cycle](https://ifh.cc/g/LX4y0y.png) 
-
-
 
 
 ## Architecture
