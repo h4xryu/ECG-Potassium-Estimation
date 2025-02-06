@@ -31,13 +31,9 @@ Distribution of serum potassium levels across 826 patients:
 | 8.0-8.5 | 34 |
 | ≥8.5 | 45 |
 
-
-
 <div align="center">
   <img src="./potassium-distribution.svg" width="900" alt="Serum Potassium Levels Distribution">
 </div>
-
-
 
 Preprocessing Overview: Refer to the included visualizations and preprocessing function for insights into the signal preparation process.
 
