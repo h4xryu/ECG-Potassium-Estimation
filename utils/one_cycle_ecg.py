@@ -12,7 +12,7 @@ def one_cycle(ecg,spl,pat, fs=500):
 
         # ecg[i], opt = process_peaks_crop_old(ecg_signal)
         ecg[i], opt = process_peaks_crop_PQRST(ecg_signal, sampling_rate=fs)
-        ecg[i] = (ecg[i] - np.mean(ecg[i])) / np.std(ecg[i])
+
 
         ecg_collected.append(ecg[i])
 
