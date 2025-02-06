@@ -224,6 +224,22 @@ Notes:
 
    - reconstruction test
       ![nn](https://ifh.cc/g/QNbCpg.png)
+      Reconstruction Error - MSE: 39.744705, MAE: 3.202912
      
+   - confusion matrix
+      ![nn](https://ifh.cc/g/frC8vK.png)
+     Classification Report:
+              precision    recall  f1-score   support
 
+        <4.0       0.00      0.00      0.00         4
+     4.0-5.0       0.25      0.04      0.06        28
+     5.0-6.0       0.51      0.42      0.46        52
+     6.0-7.0       0.29      0.50      0.36        36
+     7.0-8.0       0.27      0.46      0.34        28
+        >8.0       0.43      0.18      0.25        17
+
+    accuracy                           0.35       165
+   macro avg       0.29      0.27      0.25       165
+weighted avg       0.36      0.35      0.32       165
+     
 
