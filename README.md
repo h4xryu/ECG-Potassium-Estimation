@@ -17,23 +17,7 @@ This project implements a novel approach for predicting potassium levels from EC
 
 Distribution of serum potassium levels across 826 patients:
 
-| Range (mEq/L) | Number of Patients |
-|---------------|-------------------|
-| 3.5-4.0 | 27 |
-| 4.0-4.5 | 51 |
-| 4.5-5.0 | 53 |
-| 5.0-5.5 | 120 |
-| 5.5-6.0 | 143 |
-| 6.0-6.5 | 93 |
-| 6.5-7.0 | 83 |
-| 7.0-7.5 | 108 |
-| 7.5-8.0 | 69 |
-| 8.0-8.5 | 34 |
-| ≥8.5 | 45 |
-
-<div align="center">
-  <img src="./potassium-distribution.svg" width="900" alt="Serum Potassium Levels Distribution">
-</div>
+![nn](https://ifh.cc/g/6MPfhp.png)
 
 Preprocessing Overview: Refer to the included visualizations and preprocessing function for insights into the signal preparation process.
 
