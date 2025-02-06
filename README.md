@@ -13,6 +13,8 @@ This project implements a novel approach for predicting potassium levels from EC
 - Handcrafted feature extraction for capturing domain knowledge
 - A fusion mechanism combining both learned and handcrafted features
 
+  ![nn](https://ifh.cc/g/fpKc08.png)
+
 **Dataset**
 
 Distribution of serum potassium levels across 826 patients:
