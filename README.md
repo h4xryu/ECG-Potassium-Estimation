@@ -1,7 +1,7 @@
 # Variational Auto Encoder Based Two stage Potassium Level Prediction Framework
 ***
 
-This repository contains implementations and preprocessing methods for deep learning-based potassium level prediction from ECG signals. The dataset consists of 826 patients' ECG signals (Lead-II, V5) sampled at 500 Hz from Wonju Severance Hospital.
+This repository contains implementations and preprocessing methods for deep learning-based potassium level prediction from ECG signals. The dataset consists of 826 patients' 12-lead ECG signals sampled at 500 Hz from Wonju Severance Hospital.
 
 
 A two-stage learning framework for non-invasive potassium level prediction using electrocardiogram (ECG) signals. This framework combines traditional ECG feature extraction with deep learning-based variational autoencoder for robust representation learning.
@@ -42,7 +42,7 @@ Used viterbi algorithm
 ### Stage 1: Feature Learning
 - **Deep Learning Path**: Beta-VAE architecture for learning latent representations
 - **Traditional Path**: Extraction of clinically relevant ECG features
-- Input: Median beat ECG signals (leads II and V5)
+- Input: 12-lead ECG signals
 
 ### Stage 2: Potassium Prediction
 - Feature fusion module combining deep and handcrafted features
@@ -67,7 +67,7 @@ from model import train_two_stage_model
 # Example hyperparameters
 hyper_param = {
     'reconstruction_loss': 'mae',
-    'in_channel': 2,
+    'in_channel': 12,
     'channels': 128,
     'depth': 7,
     'width': 512,
@@ -113,7 +113,7 @@ def test_reconstruction(model, test_loader, device='cuda', num_examples=5):
 
 | Component | Description | Architecture |
 |-----------|-------------|--------------|
-| Beta-VAE | ECG Signal Representation Learning | - Input: (batch_size, 2, sequence_length) ECG signals<br>- Encoder: Conv1D layers with increasing channels<br>- Latent space: 64-dimensional<br>- Decoder: Transposed Conv1D layers |
+| Beta-VAE | ECG Signal Representation Learning | - Input: (batch_size, 12, sequence_length) ECG signals<br>- Encoder: Conv1D layers with increasing channels<br>- Latent space: 64-dimensional<br>- Decoder: Transposed Conv1D layers |
 | HandcraftFeatureExtractor | Traditional ECG Feature Extraction | - Statistical features<br>- Morphological features<br>- Time-domain features<br>- Output: 9-dimensional feature vector |
 | PotassiumRegressor | Feature Fusion & Prediction | - Input: Combined VAE (64-dim) and handcrafted (9-dim) features<br>- Hidden layers: [512, 256, 128]<br>- Output: Single potassium value |
 
@@ -122,7 +122,7 @@ def test_reconstruction(model, test_loader, device='cuda', num_examples=5):
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | reconstruction_loss | 'mae' | VAE reconstruction loss type |
-| in_channel | 2 | Number of input ECG leads |
+| in_channel | 12 | Number of input ECG leads |
 | channels | 128 | Base number of convolutional channels |
 | depth | 7 | Number of convolutional layers |
 | width | 512 | Input sequence length |
@@ -144,7 +144,7 @@ def test_reconstruction(model, test_loader, device='cuda', num_examples=5):
 
 | Layer | Output Shape | Parameters |
 |-------|-------------|------------|
-| Input | (B, 2, 512) | - |
+| Input | (B, 12, 512) | - |
 | Conv1D | (B, 128, 512) | channels=128, kernel_size=5, stride=1 |
 | BatchNorm + ReLU + Dropout(0.3) | (B, 128, 512) | - |
 | Conv1D Blocks × depth | (B, 128, 512) | depth=7 layers with residual connections |
@@ -155,7 +155,7 @@ def test_reconstruction(model, test_loader, device='cuda', num_examples=5):
 | Linear | (B, 65536) | - |
 | Reshape | (B, 128, 512) | - |
 | TransConv1D Blocks × depth | (B, 128, 512) | depth=7 layers with residual connections |
-| TransConv1D | (B, 2, 512) | Output reconstruction |
+| TransConv1D | (B, 12, 512) | Output reconstruction |
 
 #### 2. HandcraftFeatureExtractor Features
 
@@ -217,12 +217,11 @@ Notes:
 ### Evaluation
 
    - reconstruction test
-      ![nn](https://ifh.cc/g/QNbCpg.png)
-      ![nn](https://ifh.cc/g/DbX5JZ.png)
+      ![nn](https://ifh.cc/g/PlldNK.jpg)
       Reconstruction Error - MSE: 39.744705, MAE: 3.202912
      
    - confusion matrix
-      ![nn](https://ifh.cc/g/frC8vK.png)
+      ![nn](https://ifh.cc/g/1T2dP8.png)
      
 ## Model Performance
 
@@ -231,19 +230,19 @@ Notes:
 | Range (mEq/L) | Precision | Recall | F1-Score | Support |
 |---------------|-----------|---------|----------|----------|
 | < 4.0         | 0.00      | 0.00    | 0.00     | 4        |
-| 4.0-5.0       | 0.25      | 0.04    | 0.06     | 28       |
-| 5.0-6.0       | 0.51      | 0.42    | 0.46     | 52       |
-| 6.0-7.0       | 0.29      | 0.50    | 0.36     | 36       |
-| 7.0-8.0       | 0.27      | 0.46    | 0.34     | 28       |
-| > 8.0         | 0.43      | 0.18    | 0.25     | 17       |
+| 4.0-5.0       | 0.12      | 0.09    | 0.11     | 28       |
+| 5.0-6.0       | 0.43      | 0.60    | 0.50     | 52       |
+| 6.0-7.0       | 0.24      | 0.32    | 0.27     | 36       |
+| 7.0-8.0       | 0.12      | 0.08    | 0.10     | 28       |
+| > 8.0         | 0.32      | 0.29    | 0.44     | 17       |
 
 ### Overall Performance Metrics
 
 | Metric        | Score |
 |---------------|-------|
-| Accuracy      | 0.35  |
-| Macro Avg     | 0.25  |
-| Weighted Avg  | 0.32  |
+| Accuracy      | 0.32  |
+| Macro Avg     | 0.24  |
+| Weighted Avg  | 0.30  |
 
 ### Key Observations:
 1. Best performance in the 5.0-6.0 mEq/L range (F1-score: 0.46)
