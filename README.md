@@ -1,7 +1,7 @@
 # Variational Auto Encoder Based Two stage Potassium Level Prediction Framework
 ***
 
-This repository contains implementations and preprocessing methods for deep learning-based potassium level prediction from ECG signals. The dataset consists of 1,567 patients' ECG signals (Lead-II, V5) sampled at 500 Hz from Wonju Severance Hospital.
+This repository contains implementations and preprocessing methods for deep learning-based potassium level prediction from ECG signals. The dataset consists of 826 patients' ECG signals (Lead-II, V5) sampled at 500 Hz from Wonju Severance Hospital.
 
 
 A two-stage learning framework for non-invasive potassium level prediction using electrocardiogram (ECG) signals. This framework combines traditional ECG feature extraction with deep learning-based variational autoencoder for robust representation learning.
@@ -15,17 +15,29 @@ This project implements a novel approach for predicting potassium levels from EC
 
 **Dataset**
 
-| Potassium Concentration Range (Lead-II) (mEq/L) | Number of Samples |
-|---------------------------------------|-------------------|
-| `< 4.0`                               | 52                |
-| `4.0 - 5.0`                           | 190               |
-| `5.0 - 6.0`                           | 496               |
-| `6.0 - 7.0`                           | 336               |
-| `7.0 - 8.0`                           | 341               |
-| `> 8.0`                               | 152               |
+Distribution of serum potassium levels across 826 patients:
 
-**Serum Potassium level Distribution**  
-   ![Potassium Distribution](https://ifh.cc/g/cFKT1Q.png)
+| Range (mEq/L) | Number of Patients |
+|---------------|-------------------|
+| 3.5-4.0 | 27 |
+| 4.0-4.5 | 51 |
+| 4.5-5.0 | 53 |
+| 5.0-5.5 | 120 |
+| 5.5-6.0 | 143 |
+| 6.0-6.5 | 93 |
+| 6.5-7.0 | 83 |
+| 7.0-7.5 | 108 |
+| 7.5-8.0 | 69 |
+| 8.0-8.5 | 34 |
+| ≥8.5 | 45 |
+
+
+
+<div align="center">
+  <img src="./potassium-distribution.svg" width="900" alt="Serum Potassium Levels Distribution">
+</div>
+
+
 
 Preprocessing Overview: Refer to the included visualizations and preprocessing function for insights into the signal preparation process.
 
