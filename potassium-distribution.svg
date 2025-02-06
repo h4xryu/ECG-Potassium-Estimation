@@ -7,6 +7,9 @@
     .bar:hover { fill: #6366F1; }
     .grid { stroke: #eee; stroke-width: 1; }
   </style>
+
+  <!-- Background -->
+  <rect width="900" height="700" fill="white"/>
   
   <!-- Title -->
   <text x="450" y="50" text-anchor="middle" class="title">Serum Potassium Levels Distribution</text>
@@ -38,7 +41,8 @@
     <rect x="612" y="-79" width="55" height="79" class="bar" rx="4" />
     <rect x="680" y="-105" width="55" height="105" class="bar" rx="4" />
     
-   <g transform="translate(0, 40)">
+    <!-- X-axis labels with adjusted positioning -->
+    <g transform="translate(0, 40)">
       <!-- Each label is positioned relative to its bar -->
       <g transform="translate(27, 0)">
         <text transform="rotate(-45)" text-anchor="end" class="tick-label">3.5-4.0 mEq/L</text>
