@@ -214,14 +214,6 @@ Notes:
 - Combines VAE latent features with handcrafted features
 - Dropout and batch normalization for regularization
 
-### Evaluation
-
-   - reconstruction test
-      ![nn](https://ifh.cc/g/PlldNK.jpg)
-      Reconstruction Error - MSE: 39.744705, MAE: 3.202912
-     
-   - confusion matrix
-      ![nn](https://ifh.cc/g/1T2dP8.png)
      
 ## Model Performance
 
